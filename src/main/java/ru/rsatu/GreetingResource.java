@@ -2,7 +2,6 @@ package ru.rsatu;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,16 +14,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.quarkus.arc.ArcContainer;
 import io.quarkus.arc.InjectableBean;
 import io.quarkus.arc.impl.ArcContainerImpl;
 import io.quarkus.vertx.http.runtime.devmode.Json;
 import io.quarkus.vertx.http.runtime.devmode.Json.JsonArrayBuilder;
 import io.quarkus.vertx.http.runtime.devmode.Json.JsonObjectBuilder;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-import io.vertx.ext.web.Route;
-import io.vertx.ext.web.RoutingContext;
 
 @ApplicationScoped
 @Path("/hello")
@@ -40,7 +34,6 @@ public class GreetingResource {
     @Inject @EightDigits
     private NumberGenerator numberGenerator8;
 
-    private final ArrayList<InjectableBean<?>> beans = new ArrayList<InjectableBean<?>>();
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
@@ -52,17 +45,15 @@ public class GreetingResource {
     
     public String getBeans(String beanClass) {
     	JsonArrayBuilder array = Json.array();
-    	//ctx.response().putHeader("Content-Type", "application/json");
 
         ArcContainerImpl container = ArcContainerImpl.instance();
         List<InjectableBean<?>> beans = container.getBeans();
         beans.addAll(container.getInterceptors());
 
-        //String kindParam = ctx.request().getParam("kind");
+
         String kindParam = null;
        InjectableBean.Kind kind = kindParam != null ? InjectableBean.Kind.from(kindParam.toUpperCase()) : null;
-       // String scopeEndsWith = ctx.request().getParam("scope");
-        //String beanClassStartsWith = ctx.request().getParam("beanClass");
+
         
         String scopeEndsWith = null;
         String beanClassStartsWith = beanClass;
@@ -81,7 +72,6 @@ public class GreetingResource {
             }
         }
 
-        //JsonArrayBuilder array = Json.array();
         for (InjectableBean<?> injectableBean : beans) {
             JsonObjectBuilder bean = Json.object();
             bean.put("id", injectableBean.getIdentifier());
